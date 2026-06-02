@@ -26,7 +26,21 @@ const getNextId = () => notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1
 
 // Member 1 → GET /notes/:id (get single note)
 
-// Member 2 → POST /notes (create a note)
+// Create a new note
+app.post('/notes', (req, res) => {
+    const {title, content} = req.body;
+    if (!title || !content) {
+        return res.status(400).json({ error: 'title and content are required' });
+    }
+    const newNote = {
+        id: getNextId(),
+        title,
+        content,
+        createdAt: new Date()
+    };
+    notes.push(newNote);
+    res.status(201).json(newNote);
+    });
 
 // Member 3 → PUT /notes/:id (update a note)
 
