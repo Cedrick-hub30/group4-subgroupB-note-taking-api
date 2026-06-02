@@ -22,25 +22,34 @@ const getNextId = () => notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1
 
 // ─── ROUTES ───────────────────────────────────────────
 
-// Member 1 → GET /notes (get all notes)
+// get all notes 
+app.get('/notes', (req, res) => {
+  res.status(200).json(notes);
+});
 
-// Member 1 → GET /notes/:id (get single note)
+// get a single note by id
+app.get('/notes/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const note = notes.find(n => n.id === id);
+  if (!note) return res.status(404).json({ error: 'Note not found' });
+  res.status(200).json(note);
+});
 
 // Create a new note
 app.post('/notes', (req, res) => {
-    const {title, content} = req.body;
-    if (!title || !content) {
-        return res.status(400).json({ error: 'title and content are required' });
-    }
-    const newNote = {
-        id: getNextId(),
-        title,
-        content,
-        createdAt: new Date()
-    };
-    notes.push(newNote);
-    res.status(201).json(newNote);
-    });
+  const { title, content } = req.body;
+  if (!title || !content) {
+    return res.status(400).json({ error: 'title and content are required' });
+  }
+  const newNote = {
+    id: getNextId(),
+    title,
+    content,
+    createdAt: new Date()
+  };
+  notes.push(newNote);
+  res.status(201).json(newNote);
+});
 
 // Member 3 → PUT /notes/:id (update a note)
 
