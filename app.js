@@ -51,9 +51,29 @@ app.post('/notes', (req, res) => {
   res.status(201).json(newNote);
 });
 
-// Member 3 → PUT /notes/:id (update a note)
+// update a note
+app.put('/notes/:id', (req, res) => {
+const id = parseInt(req.params.id);
+const noteIndex = notes.findIndex(n => n.id === id);
+if (noteIndex === -1) return res.status(404).json({ error: 'Note not found' });
+const { title, content } = req.body;
+if (!title || !content) {
+return res.status(400).json({ error: 'title and content are required' });
+}
+});
+notes[noteIndex] = { ...notes[noteIndex], title, content };
+res.status(200).json(notes[noteIndex]);
 
-// Member 3 → DELETE /notes/:id (delete a note)
+// delete a note
+app.delete('/notes/:id', (req, res) => {
+const id = parseInt(req.params.id);
+const initialLength = notes.length;
+notes = notes.filter(n => n.id !== id);
+if (notes.length === initialLength) {
+return res.status(404).json({ error: 'Note not found' });
+}
+});
+res.status(204).send();
 
 // Member 4 → GET /notes/search (search by title)
 
