@@ -1,3 +1,5 @@
+// Note-taking API by Dennis Gyebi
+
 const express = require('express');
 const app = express();
 
