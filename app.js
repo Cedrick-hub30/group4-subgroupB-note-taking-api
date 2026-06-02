@@ -1,46 +1,41 @@
-// Note-taking API by Dennis Gyebi
+require('dotenv').config();
 
 const express = require('express');
 const app = express();
 
 app.use(express.json());
 
-// Our fake database - just a list
-let notes = [];
-let id = 1;
-
-// CREATE a note
-app.post('/notes', (req, res) => {
-    const note = { id: id++, title: req.body.title, content: req.body.content };
-    notes.push(note);
-    res.json(note);
+// logger middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
 });
 
-// GET all notes
-app.get('/notes', (req, res) => {
-    res.json(notes);
-});
+// shared in-memory data store
+let notes = [
+  { id: 1, title: 'First Note', content: 'This is my first note', createdAt: new Date() },
+  { id: 2, title: 'Second Note', content: 'This is my second note', createdAt: new Date() },
+];
 
-// GET one note
-app.get('/notes/:id', (req, res) => {
-    const note = notes.find(n => n.id == req.params.id);
-    res.json(note);
-});
+// helper function to generate next id
+const getNextId = () => notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1 : 1;
 
-// UPDATE a note
-app.put('/notes/:id', (req, res) => {
-    const note = notes.find(n => n.id == req.params.id);
-    note.title = req.body.title;
-    note.content = req.body.content;
-    res.json(note);
-});
+// ─── ROUTES ───────────────────────────────────────────
 
-// DELETE a note
-app.delete('/notes/:id', (req, res) => {
-    notes = notes.filter(n => n.id != req.params.id);
-    res.json({ message: 'Note deleted' });
-});
+// Member 1 → GET /notes (get all notes)
 
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+// Member 1 → GET /notes/:id (get single note)
+
+// Member 2 → POST /notes (create a note)
+
+// Member 3 → PUT /notes/:id (update a note)
+
+// Member 3 → DELETE /notes/:id (delete a note)
+
+// Member 4 → GET /notes/search (search by title)
+
+// Member 4 → global error handler
+
+// ─── START SERVER ─────────────────────────────────────
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
