@@ -89,6 +89,11 @@ app.delete('/notes/:id', (req, res) => {
 
 // global error handler
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong on the server' });
+});
+
 
 // START SERVER 
 const PORT = process.env.PORT || 3000;
