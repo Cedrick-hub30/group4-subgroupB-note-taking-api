@@ -20,11 +20,23 @@ let notes = [
 // helper function to generate next id
 const getNextId = () => notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1 : 1;
 
-// ─── ROUTES ───────────────────────────────────────────
+// ─── ROUTES ────────
 
-// get all notes 
+// get all notes
 app.get('/notes', (req, res) => {
   res.status(200).json(notes);
+});
+
+// search notes by title
+app.get('/notes/search', (req, res) => {
+  const { title } = req.query;
+  if (!title) {
+    return res.status(400).json({ error: 'title query parameter is required' });
+  }
+  const results = notes.filter(n =>
+    n.title.toLowerCase().includes(title.toLowerCase())
+  );
+  res.status(200).json(results);
 });
 
 // get a single note by id
@@ -35,7 +47,7 @@ app.get('/notes/:id', (req, res) => {
   res.status(200).json(note);
 });
 
-// Create a new note
+// create a new note
 app.post('/notes', (req, res) => {
   const { title, content } = req.body;
   if (!title || !content) {
@@ -53,45 +65,31 @@ app.post('/notes', (req, res) => {
 
 // update a note
 app.put('/notes/:id', (req, res) => {
-const id = parseInt(req.params.id);
-const noteIndex = notes.findIndex(n => n.id === id);
-if (noteIndex === -1) return res.status(404).json({ error: 'Note not found' });
-const { title, content } = req.body;
-if (!title || !content) {
-return res.status(400).json({ error: 'title and content are required' });
-}
+  const id = parseInt(req.params.id);
+  const noteIndex = notes.findIndex(n => n.id === id);
+  if (noteIndex === -1) return res.status(404).json({ error: 'Note not found' });
+  const { title, content } = req.body;
+  if (!title || !content) {
+    return res.status(400).json({ error: 'title and content are required' });
+  }
+  notes[noteIndex] = { ...notes[noteIndex], title, content };
+  res.status(200).json(notes[noteIndex]);
 });
-notes[noteIndex] = { ...notes[noteIndex], title, content };
-res.status(200).json(notes[noteIndex]);
 
 // delete a note
 app.delete('/notes/:id', (req, res) => {
-const id = parseInt(req.params.id);
-const initialLength = notes.length;
-notes = notes.filter(n => n.id !== id);
-if (notes.length === initialLength) {
-return res.status(404).json({ error: 'Note not found' });
-}
-});
-res.status(204).send();
-
-// search notes by title
-app.get('/notes/search', (req, res) => {
-  const { title } = req.query;
-
-  if (!title) {
-    return res.status(400).json({ error: 'title query parameter is required' });
+  const id = parseInt(req.params.id);
+  const initialLength = notes.length;
+  notes = notes.filter(n => n.id !== id);
+  if (notes.length === initialLength) {
+    return res.status(404).json({ error: 'Note not found' });
   }
-
-  const results = notes.filter(n =>
-    n.title.toLowerCase().includes(title.toLowerCase())
-  );
-
-  res.status(200).json(results);
+  res.status(204).send();
 });
 
-// Member 4 → global error handler
+// global error handler
 
-// ─── START SERVER ─────────────────────────────────────
+
+// START SERVER 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));
