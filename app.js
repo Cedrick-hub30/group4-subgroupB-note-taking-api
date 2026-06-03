@@ -75,10 +75,23 @@ return res.status(404).json({ error: 'Note not found' });
 });
 res.status(204).send();
 
-// Member 4 → GET /notes/search (search by title)
+// search notes by title
+app.get('/notes/search', (req, res) => {
+  const { title } = req.query;
+
+  if (!title) {
+    return res.status(400).json({ error: 'title query parameter is required' });
+  }
+
+  const results = notes.filter(n =>
+    n.title.toLowerCase().includes(title.toLowerCase())
+  );
+
+  res.status(200).json(results);
+});
 
 // Member 4 → global error handler
 
 // ─── START SERVER ─────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
